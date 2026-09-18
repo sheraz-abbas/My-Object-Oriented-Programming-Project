@@ -12,6 +12,8 @@
 #include <iomanip>
 #include <ctime>
 #include <cstdlib>
+#include <cctype>
+#include <cstdio>
 #include <windows.h>
 #include <conio.h>
 
