@@ -29,6 +29,11 @@ void FiftyFifty::use(Question* q)
         setColor(C_RED); cout << "\n  50-50 already used!\n"; resetColor();
         return;
     }
+    if (!q)
+    {
+        setColor(C_RED); cout << "\n  Invalid question!\n"; resetColor();
+        return;
+    }
     setColor(C_YELLOW);
     cout << "\n  >> 50-50: Two wrong answers removed!" << endl;
     cout << "     Focus on the remaining two options." << endl;
@@ -55,13 +60,39 @@ void AudiencePoll::use(Question* q)
         setColor(C_RED); cout << "\n  Poll already used!\n"; resetColor();
         return;
     }
+    if (!q)
+    {
+        setColor(C_RED); cout << "\n  Invalid question!\n"; resetColor();
+        return;
+    }
+
+    // Generate four positive weights and bias the correct answer.
+    // The normalization below guarantees the displayed percentages total 100%.
+    int weight[4];
+    int totalWeight = 0;
+    for (int i = 0; i < 4; i++)
+    {
+        weight[i] = rand() % 16 + 5;
+        totalWeight += weight[i];
+    }
+    weight[q->getCorrect() - 'A'] += 30;
+    totalWeight += 30;
+
     int v[4];
-    v[0] = rand() % 15 + 5;
-    v[1] = rand() % 15 + 5;
-    v[2] = rand() % 15 + 5;
-    v[3] = 100 - v[0] - v[1] - v[2];
-    // Bias toward correct answer
-    v[q->getCorrect() - 'A'] += 30;
+    int percentageTotal = 0;
+    for (int i = 0; i < 4; i++)
+    {
+        v[i] = (weight[i] * 100) / totalWeight;
+        percentageTotal += v[i];
+    }
+
+    // Distribute rounding remainder.
+    int remainder = 100 - percentageTotal;
+    for (int i = 0; i < 4 && remainder > 0; i++)
+    {
+        v[i]++;
+        remainder--;
+    }
 
     setColor(C_YELLOW);
     cout << "\n  >> Audience Poll Results:" << endl;
@@ -95,6 +126,11 @@ void ExpertAdvice::use(Question* q)
     if (used)
     {
         setColor(C_RED); cout << "\n  Expert already used!\n"; resetColor();
+        return;
+    }
+    if (!q)
+    {
+        setColor(C_RED); cout << "\n  Invalid question!\n"; resetColor();
         return;
     }
     setColor(C_YELLOW);
